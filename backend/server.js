@@ -427,6 +427,10 @@ app.get("/api/download", async (req, res) => {
 });
 
 // ── Health check ──────────────────────────────────────────────────────────────
+app.get("/", (req, res) => {
+  res.send("SanTube API is running successfully! 🚀");
+});
+
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", service: "SanTube API", version: "1.0.0" });
 });
