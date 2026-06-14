@@ -22,8 +22,9 @@ export default function DownloadBar({ videoInfo, selectedFormat, url }) {
       ext: selectedFormat.ext || 'mp4',
     })
 
+    const API_BASE = import.meta.env.VITE_API_URL || '';
     const anchor = document.createElement('a')
-    anchor.href = `/api/download?${params.toString()}`
+    anchor.href = `${API_BASE}/api/download?${params.toString()}`
     anchor.download = `${(videoInfo?.title || 'video').replace(/[^a-zA-Z0-9\s\-_.()]/g, '').trim()}.${selectedFormat.ext || 'mp4'}`
     document.body.appendChild(anchor)
     anchor.click()

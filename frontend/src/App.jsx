@@ -20,7 +20,8 @@ export default function App() {
     setCurrentUrl(url)
 
     try {
-      const res = await fetch('/api/fetch-info', {
+      const API_BASE = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${API_BASE}/api/fetch-info`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url }),
