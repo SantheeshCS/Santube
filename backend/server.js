@@ -59,9 +59,6 @@ function spawnYtDlp(args) {
 }
 
 function addBypassArgs(args) {
-  // Add extractor arguments to spoof the client and bypass bot detection
-  args.push("--extractor-args", "youtube:player_client=ios,default");
-
   const cookiesPath = path.join(__dirname, "cookies.txt");
   if (fs.existsSync(cookiesPath)) {
     args.push("--cookies", cookiesPath);
