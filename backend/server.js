@@ -61,7 +61,10 @@ function spawnYtDlp(args) {
 function addBypassArgs(args) {
   const cookiesPath = path.join(__dirname, "cookies.txt");
   if (fs.existsSync(cookiesPath)) {
+    console.log("[Santube] SUCCESS: cookies.txt found at", cookiesPath);
     args.push("--cookies", cookiesPath);
+  } else {
+    console.log("[Santube] WARNING: cookies.txt NOT found at", cookiesPath);
   }
   return args;
 }
