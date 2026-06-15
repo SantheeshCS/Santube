@@ -4,6 +4,7 @@
   "description": "SanTube backend — yt-dlp powered video downloader API",
   "main": "server.js",
   "scripts": {
+    "postinstall": "pip install -U yt-dlp || python3 -m pip install -U yt-dlp || echo 'Could not update yt-dlp automatically'",
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
