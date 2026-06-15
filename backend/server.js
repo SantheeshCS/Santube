@@ -3,6 +3,7 @@ const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 const { spawn } = require("child_process");
 const path = require("path");
+const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -55,6 +56,17 @@ function spawnYtDlp(args) {
     return spawn(customPath, args);
   }
   return spawn("python", ["-m", "yt_dlp", ...args]);
+}
+
+function addBypassArgs(args) {
+  // Add extractor arguments to spoof the client and bypass bot detection
+  args.push("--extractor-args", "youtube:player_client=ios,default");
+
+  const cookiesPath = path.join(__dirname, "cookies.txt");
+  if (fs.existsSync(cookiesPath)) {
+    args.push("--cookies", cookiesPath);
+  }
+  return args;
 }
 
 function buildFormatList(formats, platform) {
@@ -164,12 +176,13 @@ app.post("/api/fetch-info", (req, res) => {
     });
   }
 
-  const args = [
+  let args = [
     "--dump-json",
     "--no-playlist",
-    "--no-warnings",
-    url.trim(),
+    "--no-warnings"
   ];
+  args = addBypassArgs(args);
+  args.push(url.trim());
 
   const proc = spawnYtDlp(args);
   let stdout = "";
@@ -329,8 +342,15 @@ app.get("/api/download", async (req, res) => {
       return res.status(500).json({ error: "Server missing ffmpeg-static for muxing.", code: "FFMPEG_MISSING" });
     }
 
-    const videoProc = spawnYtDlp(["-f", vidId, "--no-warnings", "-o", "-", url.trim()]);
-    const audioProc = spawnYtDlp(["-f", audId, "--no-warnings", "-o", "-", url.trim()]);
+    let vidArgs = ["-f", vidId, "--no-warnings"];
+    vidArgs = addBypassArgs(vidArgs);
+    vidArgs.push("-o", "-", url.trim());
+    const videoProc = spawnYtDlp(vidArgs);
+
+    let audArgs = ["-f", audId, "--no-warnings"];
+    audArgs = addBypassArgs(audArgs);
+    audArgs.push("-o", "-", url.trim());
+    const audioProc = spawnYtDlp(audArgs);
 
     const ffmpegArgs = [
       "-i", "pipe:3",
@@ -375,13 +395,13 @@ app.get("/api/download", async (req, res) => {
     });
 
   } else {
-    const args = [
+    let args = [
       "-f", formatId,
       "--no-playlist",
-      "--no-warnings",
-      "-o", "-",
-      url.trim(),
+      "--no-warnings"
     ];
+    args = addBypassArgs(args);
+    args.push("-o", "-", url.trim());
 
     const proc = spawnYtDlp(args);
 
